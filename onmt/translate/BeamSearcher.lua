@@ -93,7 +93,13 @@ function BeamSearcher:_findKBest(beams, scores)
   local consideredScores, consideredIds = expandedScores:topk(considered, 2, true, true)
   consideredIds:add(-1)
   local consideredBackPointer = (consideredIds:clone():div(vocabSize)):add(1)
-  local consideredToken = consideredIds:fmod(vocabSize):add(1):view(-1)
+  --
+  -- Is this a bug?
+  local consideredIdsClone = consideredIds:clone()
+  consideredIdsClone:div(vocabSize)
+  consideredIds:add(-1 * vocabSize, consideredIdsClone)
+  local consideredToken = consideredIds:add(1):view(-1)
+--  local consideredToken = consideredIds:fmod(vocabSize):add(1):view(-1)
 
   local newBeam = beams[t]:_nextBeam(consideredToken, consideredScores,
                                     consideredBackPointer, self.beamSize)
